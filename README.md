@@ -17,7 +17,7 @@
 - `cd /<path>/<to>/<LSIget-directory>/`
 - NOTE: You may also want to copy the script to a destination within your $PATH (and avoid having to prepend `./` to the command).
 
-**Run: `./ioctemp.sh ./`** (from within an LSIget log directory, this greps recursively through sub-folders for you.)
+**Run: `./ioctemp.sh`** (from within an LSIget log directory, this greps recursively through sub-folders for you.)
 
 NOTE: The `$STATUS` variable/value is hardcoded; if greater than 54C, this returns "overheat". Othewise, (if 54C or less) this returns "OK" for status.
 
