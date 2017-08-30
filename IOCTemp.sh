@@ -1,12 +1,12 @@
 #!/bin/bash
 
-# Run this script from within the LSIget directory containing the "Summary.txt"
-# This script will convert the 'hex' value to a 'decimal' temperature value.
-# If you don't encounter any 'Summary.txt' file; check the other HBA logs that are contained in LSI_Products subdirectory.
+# Most LSI/Broadcom HBAs have a "max safe operating temp" of 55C.
+# The temperature value, however, is denoted in 'hex' number format.
+# Run this script from within the unzipped LSIget directory to locate the hex value and convert to decimal.
 
 format="%-15s %2s %8s %-1s %-12s\n"
 
-IOCTempHex=`cat Summary.txt | grep "IOCTemperature:" | cut -f 21 -d " "`
+IOCTempHex=`grep -r 'IOCTemperature' . | cut -f 21 -d " "`
 
 printf "$format" "IOCTemperature" "=" "$IOCTempHex"
 
