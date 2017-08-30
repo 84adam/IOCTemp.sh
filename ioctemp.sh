@@ -1,22 +1,57 @@
 #!/bin/bash
 
-# Most LSI/Broadcom HBAs have a "max safe operating temp" of 55C.
-# The temperature value, however, is denoted in 'hex' number format.
-# Run this script from within the unzipped LSIget directory to locate the hex value and convert to decimal.
+# Get LSI/Broadcom HBA temperature values from LSIget logs
+# Print filename(s) for files containing HBA hex temperature values
 
-format="%-15s %2s %8s %-1s %-12s\n"
+formatFILESheader="\n %-50s \n\n"
+printf "$formatFILESheader" "Files Containing HBA Temperature Data:"
 
-IOCTempHex=`grep -r 'IOCTemperature' . | cut -f 21 -d " "`
+formatFILES="%-50s\n"
 
-printf "$format" "IOCTemperature" "=" "$IOCTempHex"
+aFILES=( `grep -rH --include=*.txt 'IOCTemperature:' | cut -f 1 -d ":"` )
 
-DECIMAL=`printf "%d\n" $IOCTempHex `
+for i in "${aFILES[@]}"
+do
+  printf "$formatFILES" "$i"
+done | nl -s ". "
 
-if test $DECIMAL -gt 54
-then
-  STATUS="(overheat)"
-else
-  STATUS="(OK)"
+# Print HBA temperature values with status (overheat/OK)
+# Create hex temperature array, print value for each HBA
+
+formatHEXheader="\n %-50s \n\n"
+printf "$formatHEXheader" "Hex Temperature Values:"
+
+formatTEMP="%-15s %2s %8s %-1s %-12s\n"
+
+aIOC_hex=( `grep -r 'IOCTemperature:' . | cut -f 21 -d " "` )
+
+for i in "${aIOC_hex[@]}"
+do
+  printf "$formatTEMP" "IOCTemperature" "=" "$i"
+done | nl -s ". "
+
+# Create decimal temperature array, print value and status for each HBA
+
+formatDECheader="\n %-50s \n\n"
+printf "$formatDECheader" "Decimal Temperature Values & Status:"
+
+aIOC_decimal=(
+$(
+for i in "${aIOC_hex[@]}"
+do
+  printf "%d\n" "$i"
+done
+)
+)
+
+for i in "${aIOC_decimal[@]}"
+do
+  if test $i -gt 54
+  then 
+    printf "$formatTEMP" "HBA Temperature" "=" "$i" "C" "(overheat)"
+  else
+    printf "$formatTEMP" "HBA Temperature" "=" "$i" "C" "(OK)"
   fi
+done | nl -s ". "
 
-printf "$format" "HBA Temperature" "=" $DECIMAL "C" $STATUS
+printf "\n"
